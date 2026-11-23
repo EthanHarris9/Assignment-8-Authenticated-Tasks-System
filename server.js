@@ -1,5 +1,9 @@
 const express = require('express');
-const { db, Project, Task } = require('./database/setup');
+const { db, sequelize, Project, Task, User } = require('./database/setup');
+
+// Import bcrypt
+const bcrypt = require('bcryptjs');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -196,6 +200,9 @@ app.delete('/api/tasks/:id', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete task' });
     }
 });
+
+
+
 
 // Start server
 app.listen(PORT, () => {
