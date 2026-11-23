@@ -4,7 +4,7 @@ require('dotenv').config();
 // Create Sequelize instance
 const db = new Sequelize({
   dialect: 'sqlite',
-  storage: `database/${process.env.DB_NAME}` || 'database/task_management.db',
+  storage: `database/${process.env.DB_NAME || 'task_management.db' }`,
   logging: console.log
 });
 
@@ -73,7 +73,7 @@ const User = db.define('User', {
         primaryKey: true,
         autoIncrement: true
     },
-    name: {
+    username: {
         type: DataTypes.STRING,
         allowNull: false
     },
@@ -85,7 +85,6 @@ const User = db.define('User', {
     password: {
         type: DataTypes.STRING,
         allowNull: false,
-        unique: true
     },
 });
 
