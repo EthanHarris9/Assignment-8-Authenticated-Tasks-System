@@ -201,6 +201,45 @@ app.delete('/api/tasks/:id', async (req, res) => {
     }
 });
 
+// User Routes
+
+//POST /api/register - register new user
+app.post('/api/register', async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        // Check if user with this email already exists
+        const existingUser = await User.findOne({ where: { email} });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User with this email already exists' });
+        }
+
+        // Hash the password before storing it
+        const saltRounds = 10
+        const hashedPassowrd = await bcrypt.hash(password, saltRounds);
+
+        // Create new user with hashede password
+        const newUser = await User.create({
+            username,
+            email,
+            password: hashedPassowrd // Stores the hash, not the original password
+        });
+
+        // Return success (don't send back the password)
+        res.status(201).json({
+            message: 'User registered successfully',
+            user: {
+                id: newUser.id,
+                username: newUser.username,
+                email: newUser.email
+            }
+        });
+    } catch (error) {
+        console.error('Error registering user:', error);
+        res.status(500).json({ error: 'Failed to register user' });
+    }
+});
+
 
 
 
