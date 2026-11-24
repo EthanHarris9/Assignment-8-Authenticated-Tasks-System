@@ -23,6 +23,21 @@ const PORT = process.env.PORT || 3000;
 // Middleware
 app.use(express.json());
 
+function requireAuth(req, res, next) {
+    if (req.session && req.session.userId) {
+        req.user = {
+            id: req.session.userId,
+            username: req.session.userName,
+            email: req.session.userEmail
+        };
+        next();
+    } else {
+        res.status(401).json({
+            error: 'Authentication required. Please log in.'
+        });
+    }
+}
+
 // Test database connection
 async function testConnection() {
     try {
@@ -38,7 +53,7 @@ testConnection();
 // PROJECT ROUTES
 
 // GET /api/projects - Get all projects
-app.get('/api/projects', async (req, res) => {
+app.get('/api/projects', requireAuth, async (req, res) => {
     try {
         const projects = await Project.findAll();
         res.json(projects);
