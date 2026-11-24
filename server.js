@@ -303,6 +303,16 @@ app.post('/api/login', async (req, res) => {
     }
 });
 
+// //POST /api/logout - User logout with session destruction
+app.post('/api/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if(err) {
+            console.error('Error destroying the session', err);
+            return res.status(500).json({ error: 'Failed to logout' });
+        }
+        res.json({ message: 'Logout successful' });
+    });
+});
 
 
 // Start server
