@@ -4,6 +4,18 @@ const { db, sequelize, Project, Task, User } = require('./database/setup');
 // Import bcrypt
 const bcrypt = require('bcryptjs');
 
+// Importing packege for express-session
+const session = require('express-session');
+
+app.use(session({
+    secret: process.env.SESSON_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: false,
+        maxAge: 24 * 60 * 60 * 1000
+    }
+}));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
