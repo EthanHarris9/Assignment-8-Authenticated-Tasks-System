@@ -1,11 +1,18 @@
 const express = require('express');
-const { db, sequelize, Project, Task, User } = require('./database/setup');
+const { db, Project, Task, User } = require('./database/setup');
 
 // Import bcrypt
 const bcrypt = require('bcryptjs');
 
 // Importing packege for express-session
 const session = require('express-session');
+
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
 
 app.use(session({
     secret: process.env.SESSON_SECRET,
@@ -16,12 +23,6 @@ app.use(session({
         maxAge: 24 * 60 * 60 * 1000
     }
 }));
-
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-// Middleware
-app.use(express.json());
 
 function requireAuth(req, res, next) {
     if (req.session && req.session.userId) {
@@ -88,7 +89,8 @@ app.post('/api/projects', async (req, res) => {
             name,
             description,
             status,
-            dueDate
+            dueDate,
+            userId: req.user.id
         });
         
         res.status(201).json(newProject);
@@ -233,7 +235,7 @@ app.delete('/api/tasks/:id', async (req, res) => {
 //POST /api/register - register new user
 app.post('/api/register', async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { username, email, password } = req.body;
 
         // Check if user with this email already exists
         const existingUser = await User.findOne({ where: { email} });
@@ -243,13 +245,13 @@ app.post('/api/register', async (req, res) => {
 
         // Hash the password before storing it
         const saltRounds = 10
-        const hashedPassowrd = await bcrypt.hash(password, saltRounds);
+        const hashedPassword = await bcrypt.hash(password, saltRounds);
 
         // Create new user with hashede password
         const newUser = await User.create({
             username,
             email,
-            password: hashedPassowrd // Stores the hash, not the original password
+            password: hashedPassword // Stores the hash, not the original password
         });
 
         // Return success (don't send back the password)
